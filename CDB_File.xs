@@ -582,8 +582,10 @@ cdb_TIEHASH(CLASS, filename, option_key="", is_utf8=FALSE)
         RETVAL->fh = f = PerlIO_open(filename, "rb");
         RETVAL->is_utf8 = utf8_chosen;
 
-        if (!f)
+        if (!f) {
+            Safefree(RETVAL);
             XSRETURN_NO;
+        }
 #ifdef HASMMAP
         {
             struct stat st;
