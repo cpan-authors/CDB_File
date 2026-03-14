@@ -341,6 +341,8 @@ static int match(cdb *c, string_finder *to_find, U32 pos) {
     nextkey.is_utf8 = c->is_utf8;
     SET_FINDER_LEN(nextkey, to_find->len);
     nextkey.pv      = cdb_map_addr(c, to_find->len, pos);
+    if (nextkey.pv == NULL)
+        return -1;
     return cdb_key_eq(&nextkey, to_find);
 #else
     /* If we don't have windows, then we have to read the file in */
