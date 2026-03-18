@@ -854,9 +854,16 @@ cdb_new(CLASS, fn, fntemp, option_key="", is_utf8=FALSE)
         cdbmake->f = PerlIO_open(fntemp, "wb");
         cdbmake->is_utf8 = utf8_chosen;
 
-        if (!cdbmake->f) XSRETURN_UNDEF;
+        if (!cdbmake->f) {
+            Safefree(cdbmake);
+            XSRETURN_UNDEF;
+        }
 
-        if (cdb_make_start(cdbmake) < 0) XSRETURN_UNDEF;
+        if (cdb_make_start(cdbmake) < 0) {
+            PerlIO_close(cdbmake->f);
+            Safefree(cdbmake);
+            XSRETURN_UNDEF;
+        }
 
         /* Oh, for referential transparency. */
         New(0, cdbmake->fn, strlen(fn) + 1, char);
@@ -883,9 +890,28 @@ cdbmaker_DESTROY(sv)
         CODE:
             if (sv_isobject(sv) && (SvTYPE(SvRV(sv)) == SVt_PVMG) ) {
                 this = (cdb_make*)SvIV(SvRV(sv));
-                if(this->f) {
-                    PerlIO_close(this->f);
+
+                /* Free the hplist chain (not freed if finish() was never called) */
+                {
+                    struct cdb_hplist *x, *next;
+                    for (x = this->head; x; x = next) {
+                        next = x->next;
+                        Safefree(x);
+                    }
                 }
+
+                /* Remove temp file if finish() was never called */
+                if (this->fntemp)
+                    (void)unlink(this->fntemp);
+
+                if (this->fn)
+                    Safefree(this->fn);
+                if (this->fntemp)
+                    Safefree(this->fntemp);
+
+                if (this->f)
+                    PerlIO_close(this->f);
+
                 Safefree(this);
             }
 
@@ -1036,6 +1062,8 @@ cdbmaker_finish(this)
         }
 
         Safefree(this->split);
+        this->split = 0;
+        this->head = 0; /* already freed in the loop above */
 
         if (PerlIO_flush(this->f) == EOF) writeerror();
         PerlIO_rewind(this->f);
@@ -1058,7 +1086,9 @@ cdbmaker_finish(this)
         }
 
         Safefree(this->fn);
+        this->fn = 0;
         Safefree(this->fntemp);
+        this->fntemp = 0;
 
         RETVAL = 1;
 
