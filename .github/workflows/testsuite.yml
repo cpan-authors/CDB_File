@@ -8,66 +8,45 @@ on:
       - "*"
   pull_request:
 
+env:
+  PERL_USE_UNSAFE_INC: 0
+  AUTOMATED_TESTING: 1
+  RELEASE_TESTING: 1
+
 jobs:
-  ubuntu:
-    env:
-      PERL_USE_UNSAFE_INC: 0
-      AUTHOR_TESTING: 1
-      AUTOMATED_TESTING: 1
-      RELEASE_TESTING: 1
-
+  perl-versions:
     runs-on: ubuntu-latest
-
+    outputs:
+      perl-versions: ${{ steps.perl-versions.outputs.perl-versions }}
     steps:
-      - uses: actions/checkout@v2
-      - name: perl -V
-        run: perl -V
-      - name: Install Dependencies
-        uses: perl-actions/install-with-cpm@v1
+      - id: perl-versions
+        uses: perl-actions/perl-versions@v2
         with:
-          cpanfile: "cpanfile"
-      - name: Makefile.PL
-        run: perl -I$(pwd) Makefile.PL
-      - name: make test
-        run: make test
-      - name: Extended Tests
-        run: prove -b xt/*.t
+          since-perl: 5.8
+          with-devel: false
 
   linux:
-    name: "linux ${{ matrix.perl-version }}"
-    needs: [ubuntu]
+    needs: perl-versions
     runs-on: ubuntu-latest
+    name: "linux ${{ matrix.perl-version }}"
 
     env:
-      PERL_USE_UNSAFE_INC: 0
       AUTHOR_TESTING: 1
-      AUTOMATED_TESTING: 1
-      RELEASE_TESTING: 1
       PERL_CARTON_PATH: $GITHUB_WORKSPACE/local
 
     strategy:
+      fail-fast: false
       matrix:
-        perl-version:
-          - "latest"
-          - "5.32"
-          - "5.30"
-          - "5.28"
-          - "5.26"
-          - "5.24"
-          - "5.22"
-          - "5.20"
-          - "5.18"
-          - "5.16"
-          - "5.14"
-          - "5.12"
-          - "5.10"
-          - "5.8"
+        perl-version: ${{ fromJson(needs.perl-versions.outputs.perl-versions) }}
+        include:
+          - perl-version: "latest"
+            run-extended-tests: true
 
     container:
       image: perl:${{ matrix.perl-version }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
@@ -79,21 +58,19 @@ jobs:
       - run: make
       - run: make test
       - name: Extended Tests
+        if: matrix.run-extended-tests
         run: prove -b xt/*.t
 
   macOS:
-    needs: [ubuntu, linux]
+    needs: [linux]
     runs-on: macOS-latest
 
     env:
-      PERL_USE_UNSAFE_INC: 0
       AUTHOR_TESTING: 1
-      AUTOMATED_TESTING: 1
-      RELEASE_TESTING: 1
       PERL_CARTON_PATH: $GITHUB_WORKSPACE/local
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Perl
         run: brew install perl
       - name: perl -V
@@ -110,11 +87,11 @@ jobs:
         run: prove -b xt/*.t
 
   windows:
-    needs: [ubuntu, linux]
+    needs: [linux]
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Perl
         run: |
           choco install strawberryperl
