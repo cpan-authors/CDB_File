@@ -419,9 +419,7 @@ static int cdb_findnext(cdb *c, string_finder *to_find) {
                 switch(match(c, to_find, pos + 8)) {
                     case -1:
                         return -1;
-                    case 0:
-                        return 0;
-                    default:
+                    case 1:
                         uint32_unpack(buf + 4,&c->dlen);
                         c->dpos = pos + 8 + next_key_len;
                         return 1;
