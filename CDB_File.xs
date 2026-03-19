@@ -900,6 +900,10 @@ cdbmaker_DESTROY(sv)
                     }
                 }
 
+                /* Close file handle before unlinking (required on Windows) */
+                if (this->f)
+                    PerlIO_close(this->f);
+
                 /* Remove temp file if finish() was never called */
                 if (this->fntemp)
                     (void)unlink(this->fntemp);
@@ -908,9 +912,6 @@ cdbmaker_DESTROY(sv)
                     Safefree(this->fn);
                 if (this->fntemp)
                     Safefree(this->fntemp);
-
-                if (this->f)
-                    PerlIO_close(this->f);
 
                 Safefree(this);
             }
