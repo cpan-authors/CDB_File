@@ -434,8 +434,7 @@ sub create(\%$$;$$) {
     {
         $cdb->insert(%$RHdata);
     }
-    $cdb->finish;
-    return 1;
+    return $cdb->finish;
 }
 
 1;
