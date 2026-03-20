@@ -1027,7 +1027,7 @@ cdbmaker_finish(this)
                 uint32_pack(buf, this->hash[u].h);
                 uint32_pack(buf + 4, this->hash[u].p);
 
-                if (PerlIO_write(this->f, buf, 8) == -1)
+                if (PerlIO_write(this->f, buf, 8) < 8)
                     XSRETURN_UNDEF;
 
                 if (posplus(this, 8) == -1)
