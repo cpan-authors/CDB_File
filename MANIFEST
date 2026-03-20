@@ -12,6 +12,7 @@ ppport.h
 t/01main.t
 t/02last.t
 t/03fetchall.t
+t/bytes.t
 t/clear.t
 t/cow.t
 t/empty.t

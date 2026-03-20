@@ -110,6 +110,27 @@ This feature is not available below 5.14 due to lack of Perl macro support.
 B<NOTE:> read/write of databases not stored in utf8 mode will often be
 incompatible with any non-ascii data.
 
+=head2 Bytes mode
+
+A C<bytes> mode is also available, enabled by passing C<bytes =E<gt> 1>
+to B<new>, B<tie>, or B<create>. This mode uses C<SvPVbyte()> to coerce
+all strings to their byte representation before storage or lookup.
+
+This is the opposite of utf8 mode: instead of upgrading strings to UTF-8,
+it downgrades them to bytes. If a string contains a code point above 255
+(a "wide character"), Perl will croak. This ensures that only byte-safe
+data is stored and retrieved.
+
+Use this mode when you need to store pre-encoded data (e.g., UTF-16 or
+other encodings) and want to guarantee byte-level consistency regardless
+of Perl's internal string representation.
+
+    # Store and retrieve with bytes mode
+    CDB_File::create %data, $file, "$file.$$", bytes => 1;
+    tie %h, 'CDB_File', $file, bytes => 1;
+
+B<NOTE:> C<utf8> and C<bytes> modes are mutually exclusive.
+
 =head1 EXAMPLES
 
 These are all complete programs.
