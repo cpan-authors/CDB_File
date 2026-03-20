@@ -24,11 +24,11 @@ is( "$@", '', "Create cdb" );
 # Test that good file works.
 tie( my %h, "CDB_File", $db->filename, 'utf8' => 0 ) and pass("Test that good file works");
 
-like exception { delete $h{'one'} }, qr{^\QModification of a CDB_File attempted at t/clear.t\E}, "Test dies if you try to delete a key in a tied hash";
-like exception { $h{'one'} = 5 }, qr{^\QModification of a CDB_File attempted at t/clear.t\E}, "Test dies if you try to modify a key in a tied hash";
+like exception { delete $h{'one'} }, qr{^\QModification of a CDB_File attempted at $0\E}, "Test dies if you try to delete a key in a tied hash";
+like exception { $h{'one'} = 5 }, qr{^\QModification of a CDB_File attempted at $0\E}, "Test dies if you try to modify a key in a tied hash";
 
 my $t = tied %h;
 
-like exception { $t->CLEAR }, qr{^\QModification of a CDB_File attempted at t/clear.t\E}, "Test dies if you try to clear the tied hash";
+like exception { $t->CLEAR }, qr{^\QModification of a CDB_File attempted at $0\E}, "Test dies if you try to clear the tied hash";
 
 exit;
