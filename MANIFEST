@@ -13,6 +13,7 @@ t/01main.t
 t/02last.t
 t/03fetchall.t
 t/clear.t
+t/colliding_keys.t
 t/cow.t
 t/empty.t
 t/lib/Helpers.pm
