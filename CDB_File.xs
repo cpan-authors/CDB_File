@@ -420,7 +420,7 @@ static int cdb_findnext(cdb *c, string_finder *to_find) {
                     case -1:
                         return -1;
                     case 0:
-                        return 0;
+                        continue;
                     default:
                         uint32_unpack(buf + 4,&c->dlen);
                         c->dpos = pos + 8 + next_key_len;
