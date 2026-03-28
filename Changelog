@@ -1,5 +1,11 @@
 Revision history for Perl extension CDB_File.
 
+1.06
+- Change course w/ utf8 mode: instead, provide a string_mode that allows
+  strings to be considered either Latin-1 strings or character strings.
+  This breaks compatibility with anything that adopted the utf8 flag added
+  in 1.04, but since that was so recent this seems an acceptable risk.
+
 1.05 - Todd Rinaldo <toddr@cpan.org> 2020-12-11
 - Additional tests for known corner cases.
 - Use Perl_warn not warn in XS.

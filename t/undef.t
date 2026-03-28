@@ -34,7 +34,7 @@ use CDB_File;
 eval {
     note "Test undef insert";
     my ( $db, $db_tmp ) = get_db_file_pair(1);
-    my $t = CDB_File->new( $db->filename, $db_tmp->filename, utf8 => 0 ) or die "Failed to create cdb: $!";
+    my $t = CDB_File->new( $db->filename, $db_tmp->filename, string_mode => 'sv' ) or die "Failed to create cdb: $!";
     like( warning { $t->insert( "efg", undef ) }, qr/^undef values cannot be stored in CDB_File\. Storing an empty string instead at /, "Undef values are warned." );
 
     like( warning { $t->insert( undef, "abcd" ) }, qr{^Use of uninitialized value in hash key at }, "undef keys get a warnings too." );

@@ -18,11 +18,11 @@ use CDB_File;
 my ( $db, $db_tmp ) = get_db_file_pair(1);
 
 my %a = qw(one Hello two Goodbye);
-eval { CDB_File::create( %a, $db->filename, $db_tmp->filename, 'utf8' => 1 ) or die "Failed to create cdb: $!" };
+eval { CDB_File::create( %a, $db->filename, $db_tmp->filename, string_mode => 'utf8' ) or die "Failed to create cdb: $!" };
 is( "$@", '', "Create cdb" );
 
 # Test that good file works.
-tie( my %h, "CDB_File", $db->filename, 'utf8' => 0 ) and pass("Test that good file works");
+tie( my %h, "CDB_File", $db->filename, string_mode => 'sv' ) and pass("Test that good file works");
 
 like exception { delete $h{'one'} }, qr{^\QModification of a CDB_File attempted at t/clear.t\E}, "Test dies if you try to delete a key in a tied hash";
 like exception { $h{'one'} = 5 }, qr{^\QModification of a CDB_File attempted at t/clear.t\E}, "Test dies if you try to modify a key in a tied hash";

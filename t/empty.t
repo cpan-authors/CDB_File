@@ -16,7 +16,7 @@ my ( $db, $db_tmp ) = get_db_file_pair(1);
 
 my $db_file = $db->filename;
 eval {
-    my $t = CDB_File->new( $db_file, $db_tmp->filename, utf8 => 0 ) or die "Failed to create cdb: $!";
+    my $t = CDB_File->new( $db_file, $db_tmp->filename, string_mode => 'sv' ) or die "Failed to create cdb: $!";
     $t->finish;
 };
 

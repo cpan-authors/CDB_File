@@ -26,14 +26,14 @@ utf8::upgrade($leon);
 
 my %a = qw(one Hello two Goodbye);
 $a{$avar} = $leon;
-eval { CDB_File::create( %a, $db->filename, $db_tmp->filename, 'utf8' => 1 ) or die "Failed to create cdb: $!" };
+eval { CDB_File::create( %a, $db->filename, $db_tmp->filename, string_mode => 'utf8' ) or die "Failed to create cdb: $!" };
 is( "$@", '', "Create cdb" );
 
 my %h;
 
 # Test that good file works.
-tie( %h, "CDB_File", $db->filename, 'utf8' => 1 ) and pass("Test that good file works");
-is $h{$avar},       $leon, "Access a utf8 key";
+tie( %h, "CDB_File", $db->filename, string_mode => 'utf8' ) and pass("Test that good file works");
+is $h{$avar},       $leon, "Access a utf8 key" or diag explain;
 is $h{$latin_avar}, $leon, "Access a utf8 key using its latin1 record.";
 is( utf8::is_utf8($latin_avar), '', "\$latin_avar is not converted to utf8" );
 
