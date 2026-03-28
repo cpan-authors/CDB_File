@@ -15,7 +15,7 @@ sub get_db_file_pair {
         close $file;
         close $tmp;
         unlink $file->filename;
-        unlink $file->filename;
+        unlink $tmp->filename;
     }
 
     return ( $file, $tmp );
