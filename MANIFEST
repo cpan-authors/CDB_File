@@ -16,6 +16,7 @@ t/clear.t
 t/cow.t
 t/empty.t
 t/lib/Helpers.pm
+t/maker_cleanup.t
 t/not_utf8.t
 t/undef.t
 t/utf8.t
